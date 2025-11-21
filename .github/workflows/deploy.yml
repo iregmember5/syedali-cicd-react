@@ -35,14 +35,18 @@ jobs:
 
       - name: Rsync build to server
         env:
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_USER: deploy
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PATH: /var/www/ali.handy24x7.com
           RSYNC_RSH: "ssh -p ${{ secrets.DEPLOY_PORT || 22 }}"
         run: |
-          # remove old files except .htaccess if you want; be careful
+          # remove old files except .git
           rsync -avz --delete --exclude='.git' ./build/ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/
 
       - name: Fix permissions on server
+        env:
+          DEPLOY_USER: deploy
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: /var/www/ali.handy24x7.com
         run: |
-          ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "chown -R ${DEPLOY_USER}:${DEPLOY_USER} ${DEPLOY_PATH} && chmod -R 755 ${DEPLOY_PATH}"
+          ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST}
